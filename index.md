@@ -1,19 +1,21 @@
----
-title: Home
----
-
 # Welcome to the Graph-Tool Tutorial
 
-Learn how to use the [`graph-tool`](https://graph-tool.skewed.de/) library with hands-on notebooks and guides.
+Welcome to this website dedicated to learning and exploring the [`graph-tool`](https://graph-tool.skewed.de/) package!
 
-This site is built using [Sphinx](https://www.sphinx-doc.org/en/master/) and [MyST-NB](https://myst-nb.readthedocs.io/).
+This site is built using [Sphinx](https://www.sphinx-doc.org/en/master/), a flexible documentation generator, along with [MyST-NB](https://myst-nb.readthedocs.io/), which allows seamless integration of Jupyter notebooks into Sphinx.
+
+```{toctree}
+:maxdepth: 1
+installation
+
+```
 
 ```{toctree}
 :maxdepth: 2
 :caption: Basics
 
-basics/installation
 basics/basics
+basics/graph_plotting
 ```
 
 ```{toctree}
@@ -29,6 +31,13 @@ cookbook/topsbm
 :maxdepth: 2
 :caption: Use Cases
 
-use_cases/intro
-use_cases/use_cases
+use_cases/degree_distribution_visualization
+use_cases/centrality
+use_cases/random_graphs_generation
+use_cases/null_models
+
+
+
 ```
+
+_Last updated on: {{ last_updated }}_

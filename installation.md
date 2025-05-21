@@ -1,4 +1,4 @@
-# Installation
+# Installation Guides
 
 Installing `graph-tool` can be tricky, but using `conda` makes it much easier. Here's how to do it on both Linux servers and macOS.
 
