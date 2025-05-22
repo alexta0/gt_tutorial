@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -48,7 +48,7 @@
     <link rel="prev" title="Installation Guides" href="../installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 21, 2025"/>
+    <meta name="docbuild:last-update" content="May 22, 2025"/>
   </head>
   
   
@@ -326,17 +326,21 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-graphs">Creating graphs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-example-to-create-a-weighted-graph">A simple example to create a weighted graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-ways-to-create-graphs">More ways to create graphs</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#edge-list">Edge list</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adjacency-list">Adjacency list</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-matrix">Sparse Matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-graph-from-file">Loading graph from file</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-i-o-saving-and-loading-graph">Graph I/O (saving and loading graph)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#property-maps-in-graph-tool">Property maps in <code class="docutils literal notranslate"><span class="pre">graph-tool</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-nodes-and-edges">Iterating over nodes and edges</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-neighbors">Iterating over neighbors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-iteration">Advanced iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-attributes-to-graphs-nodes-and-edges">Adding attributes to graphs, nodes, and edges</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulate-graphs">Manipulate graphs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-nodes-and-edges">Iterating over nodes and edges</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-neighbors">Iterating over neighbors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-iteration">Advanced iteration</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -361,79 +365,192 @@ document.write(`
 </div>
 </div>
 </div>
-<section id="creating-graphs">
-<h2>Creating graphs<a class="headerlink" href="#creating-graphs" title="Link to this heading">#</a></h2>
-<p>Submodules involved:</p>
-<ul class="simple">
-<li><p>collections.ns</p></li>
-<li><p>utils</p></li>
-</ul>
-<p><img alt="Simple Network" src="../_images/tikz_network.png" /></p>
-<p><code class="docutils literal notranslate"><span class="pre">graph-tool</span></code> provides the following ways:</p>
+<section id="a-simple-example-to-create-a-weighted-graph">
+<h2>A simple example to create a weighted graph<a class="headerlink" href="#a-simple-example-to-create-a-weighted-graph" title="Link to this heading">#</a></h2>
+<p>We first create an empty graph object as follows.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">graph_tool.all</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>This line creates a directed graph. If you want a directed graph (like a citation network or web graph), use <code class="docutils literal notranslate"><span class="pre">directed=False</span></code>. We then create an edge property map for weights.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_weight</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vertex_label</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>What is a property map?
+A property map in graph-tool is a data structure that attaches additional information to each element of the graph — such as a label, a category, or, in our case, a numeric weight.
+Here, “int” means the values are floating-point numbers (like 2 or 3), which are perfect for edge weights.</p>
+<p>This line prepares the graph to store a weight value for every edge we’ll add later.</p>
+<p>We then add some vertices in the graph.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v0</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+<span class="n">vertex_label</span><span class="p">[</span><span class="n">v0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;v0&quot;</span>
+
+<span class="n">v1</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+<span class="n">vertex_label</span><span class="p">[</span><span class="n">v1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;v1&quot;</span>
+
+<span class="n">v2</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+<span class="n">vertex_label</span><span class="p">[</span><span class="n">v2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;v2&quot;</span>
+
+<span class="n">v3</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+<span class="n">vertex_label</span><span class="p">[</span><span class="n">v3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;v3&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Each call to <code class="docutils literal notranslate"><span class="pre">add_vertex()</span></code> creates one new vertex. We store them in variables (v0, v1, etc.) so we can refer to them when adding edges.</p>
+<p>Now let’s connect these vertices with edges and assign a numeric weight to each edge.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e01</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">v1</span><span class="p">)</span>
+<span class="n">edge_weight</span><span class="p">[</span><span class="n">e01</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">e12</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+<span class="n">edge_weight</span><span class="p">[</span><span class="n">e12</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">e23</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v3</span><span class="p">)</span>
+<span class="n">edge_weight</span><span class="p">[</span><span class="n">e23</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">e30</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">v3</span><span class="p">,</span> <span class="n">v0</span><span class="p">)</span>
+<span class="n">edge_weight</span><span class="p">[</span><span class="n">e30</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here:</p>
+<ul class="simple">
+<li><p>add_edge(v0, v1) connects two vertices.</p></li>
+<li><p>edge_weight[e] = … assigns a weight to that specific edge using our property map.</p></li>
+</ul>
+<p>We then attach the edge_weight property map to the graph under the key “weight”. This makes it easy to access later (for example, during saving, loading, or running graph algorithms).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_weight</span>
+<span class="n">g</span><span class="o">.</span><span class="n">vertex_properties</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertex_label</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt</span><span class="o">.</span><span class="n">graph_draw</span><span class="p">(</span>
+    <span class="n">g</span><span class="p">,</span>
+    <span class="n">vertex_text</span><span class="o">=</span><span class="n">vertex_label</span><span class="p">,</span>      <span class="c1"># show node names</span>
+    <span class="n">edge_text</span><span class="o">=</span><span class="n">edge_weight</span><span class="p">,</span>          <span class="c1"># show edge weights</span>
+    <span class="n">vertex_font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">edge_font_size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+    <span class="n">vertex_fill_color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+    <span class="n">vertex_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">vertex_pen_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">edge_pen_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">edge_text_rotation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">bg_color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/graph_tool/draw/cairo_draw.py:545: UserWarning: Unknown edge attribute: text_rotation
+  warnings.warn(f&quot;Unknown {kind} attribute: &quot; + str(k), UserWarning)
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/98808ec8a70f6f765df65987e42b0f194ed309fa7b532f7c93137d5fe479ffaa.png"><img alt="../_images/98808ec8a70f6f765df65987e42b0f194ed309fa7b532f7c93137d5fe479ffaa.png" src="../_images/98808ec8a70f6f765df65987e42b0f194ed309fa7b532f7c93137d5fe479ffaa.png" style="width: 300px; height: 300px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f3229465be0, at 0x7f322705bdd0&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p>This draws the graph and saves it to weighted_graph.png. The edge weights will appear as labels along the edges.</p>
+<p>You must have Cairo installed to save to PNG or PDF.</p>
+<p>In summary, <code class="docutils literal notranslate"><span class="pre">gt.Graph</span></code> is a general multigraph class. This class encapsulates either a directed multigraph (default or if directed == True) or an undirected multigraph (if directed == False), with optional internal edge, vertex or graph properties.</p>
+</section>
+<section id="more-ways-to-create-graphs">
+<h2>More ways to create graphs<a class="headerlink" href="#more-ways-to-create-graphs" title="Link to this heading">#</a></h2>
+<p>Graph objects do not have to be built up incrementally - data specifying graph structure can be passed directly to the constructors of the various graph classes. When creating a graph structure by instantiating one of the graph classes you can specify data in several formats.</p>
+<p><code class="docutils literal notranslate"><span class="pre">graph-tool</span></code>’s <code class="docutils literal notranslate"><span class="pre">Graph</span></code> object has an <code class="docutils literal notranslate"><span class="pre">add_edge_list()</span></code> method that lets you efficiently add multiple edges from a list or NumPy array.</p>
+<p>Suppose that we have the following directed graph:</p>
+<a class="reference internal image-reference" href="../_images/tikz_network.png"><img alt="Simple Network" src="../_images/tikz_network.png" style="width: 300px;" />
+</a>
 <section id="edge-list">
 <h3>Edge list<a class="headerlink" href="#edge-list" title="Link to this heading">#</a></h3>
+<p>An <a class="reference external" href="https://en.wikipedia.org/wiki/Edge_list">edge list</a> is a data structure used to represent a graph as a list of its edges. In Python, an iterable over (source, target, weights) pairs can be used to populate the graph.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># edge list </span>
 <span class="n">elist</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># v1 → v2</span>
-    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>  <span class="c1"># v2 → v3</span>
-    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>  <span class="c1"># v3 → v4</span>
-    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>  <span class="c1"># v4 → v5</span>
-    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>  <span class="c1"># v5 → v6</span>
-    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># v6 → v1</span>
-    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>  <span class="c1"># v2 → v5</span>
-    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># v3 → v1</span>
-    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># v5 → v2</span>
-    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># v4 → v2</span>
-    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>  <span class="c1"># v6 → v3</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>  <span class="c1"># v1 → v2</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>  <span class="c1"># v2 → v3</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>  <span class="c1"># v3 → v4</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>  <span class="c1"># v4 → v5</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># v5 → v6</span>
+    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>  <span class="c1"># v6 → v1</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>  <span class="c1"># v2 → v5</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>  <span class="c1"># v3 → v1</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>  <span class="c1"># v5 → v2</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>  <span class="c1"># v4 → v2</span>
+    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>  <span class="c1"># v6 → v3</span>
 <span class="p">]</span>
 
 
 <span class="c1"># Create directed graph</span>
 <span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Add 6 vertices</span>
-<span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="c1"># # Add 6 vertices</span>
+<span class="c1"># g.add_vertex(6)</span>
 
-<span class="c1"># Add edges from list</span>
-<span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">elist</span><span class="p">)</span>
+<span class="c1"># Create edge property for weight</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
 
-<span class="c1"># Add labels (v1 to v6)</span>
+<span class="c1"># Add edges with weights</span>
+<span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">elist</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">weight</span><span class="p">])</span>
+<span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight</span>
+
+<span class="c1"># Add vertex labels (v1 to v6)</span>
 <span class="n">label_prop</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;v1&quot;</span><span class="p">,</span> <span class="s2">&quot;v2&quot;</span><span class="p">,</span> <span class="s2">&quot;v3&quot;</span><span class="p">,</span> <span class="s2">&quot;v4&quot;</span><span class="p">,</span> <span class="s2">&quot;v5&quot;</span><span class="p">,</span> <span class="s2">&quot;v6&quot;</span><span class="p">]):</span>
     <span class="n">label_prop</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">label</span>
+<span class="n">g</span><span class="o">.</span><span class="n">vertex_properties</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_prop</span>
 
 <span class="c1"># Draw the graph</span>
 <span class="n">gt</span><span class="o">.</span><span class="n">graph_draw</span><span class="p">(</span>
     <span class="n">g</span><span class="p">,</span>
     <span class="n">vertex_text</span><span class="o">=</span><span class="n">label_prop</span><span class="p">,</span>
-    <span class="n">vertex_fill_color</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># black fill</span>
-    <span class="n">vertex_font_color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># white label text</span>
+    <span class="n">edge_text</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+    <span class="n">vertex_fill_color</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">vertex_font_color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
     <span class="n">vertex_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-    <span class="n">edge_arrow_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">edge_pen_width</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+    <span class="n">edge_arrow_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>  <span class="c1"># Make arrows clearly visible</span>
+    <span class="n">edge_marker</span><span class="o">=</span><span class="s2">&quot;arrow&quot;</span><span class="p">,</span> <span class="c1"># Ensure directed arrows</span>
+    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/graph_tool/draw/cairo_draw.py:545: UserWarning: Unknown edge attribute: font_color
-  warnings.warn(f&quot;Unknown {kind} attribute: &quot; + str(k), UserWarning)
-/nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/graph_tool/draw/cairo_draw.py:545: UserWarning: Unknown edge attribute: arrow_size
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/graph_tool/draw/cairo_draw.py:545: UserWarning: Unknown edge attribute: marker
   warnings.warn(f&quot;Unknown {kind} attribute: &quot; + str(k), UserWarning)
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/36520d170556e06e4401f47909ef67c52907065b41f83fcf3619449f71b8ff78.png"><img alt="../_images/36520d170556e06e4401f47909ef67c52907065b41f83fcf3619449f71b8ff78.png" src="../_images/36520d170556e06e4401f47909ef67c52907065b41f83fcf3619449f71b8ff78.png" style="width: 500px; height: 413px;" />
+<a class="reference internal image-reference" href="../_images/2e0641cc1155d8a26a78ca6d8146888e1c0b80062d36190ef6751ce6e5e052a4.png"><img alt="../_images/2e0641cc1155d8a26a78ca6d8146888e1c0b80062d36190ef6751ce6e5e052a4.png" src="../_images/2e0641cc1155d8a26a78ca6d8146888e1c0b80062d36190ef6751ce6e5e052a4.png" style="width: 300px; height: 247px;" />
 </a>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7fa3579a42b0, at 0x7fa357869470&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f322a35b9d0, at 0x7f3227076580&gt;
 </pre></div>
 </div>
 </div>
@@ -441,54 +558,62 @@ document.write(`
 </section>
 <section id="adjacency-list">
 <h3>Adjacency list<a class="headerlink" href="#adjacency-list" title="Link to this heading">#</a></h3>
+<p>An <a class="reference external" href="https://en.wikipedia.org/wiki/Adjacency_list">adjacency list</a>, i.e. a dictionary with vertex keys mapping to an interable of vertices, which will be used to populate the graph. In our case, the dictionary looks like <code class="docutils literal notranslate"><span class="pre">{source:</span> <span class="pre">[(target,</span> <span class="pre">weight)]}</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># adjacency list </span>
-<span class="n">adj</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>         <span class="c1"># v1 → v2</span>
-    <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>      <span class="c1"># v2 → v3, v5</span>
-    <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>      <span class="c1"># v3 → v4, v1</span>
-    <span class="mi">3</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>      <span class="c1"># v4 → v5, v2</span>
-    <span class="mi">4</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>      <span class="c1"># v5 → v6, v2</span>
-    <span class="mi">5</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>      <span class="c1"># v6 → v1, v3</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">graph_tool.all</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+
+<span class="c1"># Step 1: Define the adjacency list</span>
+<span class="n">adj_list</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)],</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="p">[(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
 <span class="p">}</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">elist</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">vw</span> <span class="ow">in</span> <span class="n">adj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vw</span><span class="p">:</span>
-            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">yield</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
-        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">u</span><span class="p">,</span> <span class="kc">None</span>  <span class="c1"># include isolated nodes</span>
-            
+<span class="c1"># Step 2: Convert to edge list generator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">edge_generator</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">adj_list</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">weight</span>
 
+<span class="c1"># Step 3: Create graph</span>
 <span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>  <span class="c1"># manually ensure all 6 nodes exist</span>
-<span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">elist</span><span class="p">())</span>
+<span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>  <span class="c1"># total 6 nodes</span>
 
-<span class="c1"># Add labels (v1 to v6)</span>
+<span class="c1"># Step 4: Define edge property for weights</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">edge_generator</span><span class="p">(),</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">weight</span><span class="p">])</span>
+<span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight</span>
+
+<span class="c1"># Step 5: Add vertex labels (v1 to v6)</span>
 <span class="n">label_prop</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;v1&quot;</span><span class="p">,</span> <span class="s2">&quot;v2&quot;</span><span class="p">,</span> <span class="s2">&quot;v3&quot;</span><span class="p">,</span> <span class="s2">&quot;v4&quot;</span><span class="p">,</span> <span class="s2">&quot;v5&quot;</span><span class="p">,</span> <span class="s2">&quot;v6&quot;</span><span class="p">]):</span>
-    <span class="n">label_prop</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">label</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">label_prop</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;v</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="n">g</span><span class="o">.</span><span class="n">vertex_properties</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_prop</span>
 
-<span class="c1"># Draw the graph</span>
+<span class="c1"># Step 6: Draw the graph</span>
 <span class="n">gt</span><span class="o">.</span><span class="n">graph_draw</span><span class="p">(</span>
     <span class="n">g</span><span class="p">,</span>
     <span class="n">vertex_text</span><span class="o">=</span><span class="n">label_prop</span><span class="p">,</span>
+    <span class="n">edge_text</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
     <span class="n">vertex_fill_color</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
     <span class="n">vertex_font_color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
     <span class="n">vertex_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-    <span class="n">edge_arrow_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">edge_pen_width</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+    <span class="n">edge_arrow_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">edge_marker</span><span class="o">=</span><span class="s2">&quot;arrow&quot;</span><span class="p">,</span>
+    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<a class="reference internal image-reference" href="../_images/e9790bc54a740a7676d4c523f752bc5ffd2b26a448d2923baad5924f63c7829d.png"><img alt="../_images/e9790bc54a740a7676d4c523f752bc5ffd2b26a448d2923baad5924f63c7829d.png" src="../_images/e9790bc54a740a7676d4c523f752bc5ffd2b26a448d2923baad5924f63c7829d.png" style="width: 500px; height: 355px;" />
+<a class="reference internal image-reference" href="../_images/ac3e62f83d8d3c784766f9464fdaa638013967df8c8c379adaf3b38d67808231.png"><img alt="../_images/ac3e62f83d8d3c784766f9464fdaa638013967df8c8c379adaf3b38d67808231.png" src="../_images/ac3e62f83d8d3c784766f9464fdaa638013967df8c8c379adaf3b38d67808231.png" style="width: 220px; height: 300px;" />
 </a>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7fa35bdef6f0, at 0x7fa357869630&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f322a37f100, at 0x7f3227076740&gt;
 </pre></div>
 </div>
 </div>
@@ -498,18 +623,14 @@ document.write(`
 <h3>Sparse Matrix<a class="headerlink" href="#sparse-matrix" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># sparse matrix </span>
-
-
-<span class="c1"># Create a 6x6 sparse adjacency matrix (weight=1 if edge exists)</span>
-<span class="n">adj_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># v1 → v2</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># v2 → v3, v5</span>
-    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># v3 → v1, v4</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># v4 → v2, v5</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># v5 → v2, v6</span>
-    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># v6 → v1, v3</span>
-<span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a 6x6 sparse adjacency matrix (weight=1 if edge exists)</span>
+<span class="n">adj_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
+                        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> 
+                        <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> 
+                      <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
 <span class="c1"># Convert to sparse COO matrix</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">coo_array</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">)</span>
@@ -522,7 +643,8 @@ document.write(`
 
 <span class="c1"># Create directed graph and add edges with weights</span>
 <span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">weight</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
 <span class="n">g</span><span class="o">.</span><span class="n">add_edge_list</span><span class="p">(</span><span class="n">es</span><span class="p">,</span> <span class="n">eprops</span><span class="o">=</span><span class="p">[</span><span class="n">weight</span><span class="p">])</span>
 <span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight</span>
@@ -542,51 +664,150 @@ document.write(`
     <span class="n">vertex_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
     <span class="n">edge_pen_width</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
     <span class="n">edge_arrow_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<a class="reference internal image-reference" href="../_images/166a6c45d3f86ced44c028ce0823a0ad3e7c71ab1de92862b1c726fda1142643.png"><img alt="../_images/166a6c45d3f86ced44c028ce0823a0ad3e7c71ab1de92862b1c726fda1142643.png" src="../_images/166a6c45d3f86ced44c028ce0823a0ad3e7c71ab1de92862b1c726fda1142643.png" style="width: 536px; height: 600px;" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/graph_tool/draw/cairo_draw.py:545: UserWarning: Unknown edge attribute: font_color
+  warnings.warn(f&quot;Unknown {kind} attribute: &quot; + str(k), UserWarning)
+/nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/graph_tool/draw/cairo_draw.py:545: UserWarning: Unknown edge attribute: arrow_size
+  warnings.warn(f&quot;Unknown {kind} attribute: &quot; + str(k), UserWarning)
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/29ca145c5035332af64248a1e5896df99565ecfe27c890ad70ca041488ca7f9c.png"><img alt="../_images/29ca145c5035332af64248a1e5896df99565ecfe27c890ad70ca041488ca7f9c.png" src="../_images/29ca145c5035332af64248a1e5896df99565ecfe27c890ad70ca041488ca7f9c.png" style="width: 300px; height: 231px;" />
 </a>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7fa3579a42b0, at 0x7fa357a1c600&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f323ddb0350, at 0x7f3227077000&gt;
 </pre></div>
 </div>
 </div>
 </div>
+<p>Edge lists, adjacency lists, and adjacency matrices are all ways to represent graphs.</p>
+<ul class="simple">
+<li><p><strong>Edge List</strong>: A list of edges, where each edge is represented as a tuple of (source, target, weight).</p></li>
+<li><p><strong>Adjacency List</strong>: A dictionary where each key is a node and the value is a list of tuples representing the target node and weight.</p></li>
+<li><p><strong>Adjacency Matrix</strong>: A 2D array where the element at (i, j) represents the weight of the edge from node i to node j. If there is no edge, the value is typically 0 or infinity.</p></li>
+</ul>
 </section>
-<section id="loading-graph-from-file">
-<h3>Loading graph from file<a class="headerlink" href="#loading-graph-from-file" title="Link to this heading">#</a></h3>
+<section id="graph-i-o-saving-and-loading-graph">
+<h3>Graph I/O (saving and loading graph)<a class="headerlink" href="#graph-i-o-saving-and-loading-graph" title="Link to this heading">#</a></h3>
+<p>Graph I/O in graph-tool allows for saving and loading graphs efficiently, enabling persistence, sharing, and reproducibility of graph data. Graphs can be stored in four formats: <a class="reference external" href="http://graphml.graphdrawing.org/">GraphML</a>, <a class="reference external" href="https://www.graphviz.org/doc/info/lang.html">DOT</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Graph_Modelling_Language">GML</a>, and a compact, efficient custom binary format (<a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/gt_format.html#sec-gt-format">.gt</a>). This is particularly useful when working with large or complex networks, or when moving between stages of a workflow without recomputing graph structures or attributes.</p>
+<p>A graph can be saved or loaded to a file with the save and load methods, which take either a file name or a file-like object. A graph can also be loaded from disc with the load_graph() function, as such:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">()</span>
+<span class="c1">#  ... fill the graph ...</span>
+<span class="n">g</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;my_graph.gt.gz&quot;</span><span class="p">)</span>
+<span class="n">g2</span> <span class="o">=</span> <span class="n">load_graph</span><span class="p">(</span><span class="s2">&quot;my_graph.gt.gz&quot;</span><span class="p">)</span>
+<span class="c1"># g and g2 should be identical copies of each other</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="adding-attributes-to-graphs-nodes-and-edges">
+<h2>Adding attributes to graphs, nodes, and edges<a class="headerlink" href="#adding-attributes-to-graphs-nodes-and-edges" title="Link to this heading">#</a></h2>
+<p>As we saw in the above, <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.PropertyMap.html">property maps</a> are a way of associating additional information to the vertices, edges, or to the graph itself. There are thus three types of property maps: vertex, edge, and graph. They are handled by the classes <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.VertexPropertyMap.html#graph_tool.VertexPropertyMap"><code class="docutils literal notranslate"><span class="pre">VertexPropertyMap</span></code></a>, <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.EdgePropertyMap.html#graph_tool.EdgePropertyMap"><code class="docutils literal notranslate"><span class="pre">EdgePropertyMap</span></code></a>, and <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.GraphPropertyMap.html#graph_tool.GraphPropertyMap"><code class="docutils literal notranslate"><span class="pre">GraphPropertyMap</span></code></a>. Each created property map has an associated <em>value type</em>, which must be chosen from the predefined set:</p>
+<a class="reference internal image-reference" href="../_images/multilayer.png"><img alt="Simple Network" src="../_images/multilayer.png" style="width: 300px;" />
+</a>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># g.save(&quot;data/graph.xml.gz&quot;)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">graph_tool.all</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+
+<span class="c1"># Create a directed graph with 10 vertices</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Vertex properties</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+
+<span class="c1"># Assign labels and layer types</span>
+<span class="n">twitter</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tw1&quot;</span><span class="p">,</span> <span class="s2">&quot;tw2&quot;</span><span class="p">,</span> <span class="s2">&quot;tw3&quot;</span><span class="p">,</span> <span class="s2">&quot;tw4&quot;</span><span class="p">,</span> <span class="s2">&quot;tw5&quot;</span><span class="p">]</span>
+<span class="n">reddit</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rd1&quot;</span><span class="p">,</span> <span class="s2">&quot;rd2&quot;</span><span class="p">,</span> <span class="s2">&quot;rd3&quot;</span><span class="p">,</span> <span class="s2">&quot;rd4&quot;</span><span class="p">,</span> <span class="s2">&quot;rd5&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">twitter</span> <span class="o">+</span> <span class="n">reddit</span><span class="p">):</span>
+    <span class="n">label</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">layer</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;Twitter&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="k">else</span> <span class="s2">&quot;Reddit&quot;</span>
+
+<span class="n">g</span><span class="o">.</span><span class="n">vertex_properties</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+<span class="n">g</span><span class="o">.</span><span class="n">vertex_properties</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+
+<span class="c1"># Edge properties</span>
+<span class="n">edge_type</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
+<span class="n">edge_color</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;vector&lt;double&gt;&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define edges</span>
+<span class="n">edges</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># Intra-Twitter</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;intra_twitter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;intra_twitter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;intra_twitter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;intra_twitter&quot;</span><span class="p">),</span>
+
+    <span class="c1"># Intra-Reddit</span>
+    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;intra_reddit&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;intra_reddit&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;intra_reddit&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;intra_reddit&quot;</span><span class="p">),</span>
+
+    <span class="c1"># Inter-layer</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;inter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;inter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;inter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;inter&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="c1"># Add edges and assign types/colors</span>
+<span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">etype</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="n">edge_type</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">etype</span>
+    <span class="k">if</span> <span class="n">etype</span> <span class="o">==</span> <span class="s2">&quot;intra_twitter&quot;</span><span class="p">:</span>
+        <span class="n">edge_color</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># green</span>
+    <span class="k">elif</span> <span class="n">etype</span> <span class="o">==</span> <span class="s2">&quot;intra_reddit&quot;</span><span class="p">:</span>
+        <span class="n">edge_color</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># orange</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># inter</span>
+        <span class="n">edge_color</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># blue</span>
+
+<span class="c1"># Register properties</span>
+<span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_type</span>
+<span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_color</span>
+
+<span class="c1"># Draw the graph</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">sfdp_layout</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">graph_draw</span><span class="p">(</span>
+    <span class="n">g</span><span class="p">,</span>
+    <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+    <span class="n">vertex_text</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+    <span class="n">vertex_fill_color</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">vertex_font_color</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">edge_color</span><span class="o">=</span><span class="n">edge_color</span><span class="p">,</span>
+    <span class="n">edge_marker</span><span class="o">=</span><span class="s2">&quot;arrow&quot;</span><span class="p">,</span>
+    <span class="n">edge_arrow_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">vertex_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">output_size</span><span class="o">=</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/272fcad00f3c5107e100d4c22b1639b23d0c5135c6c46161c5c7956999128cfd.png"><img alt="../_images/272fcad00f3c5107e100d4c22b1639b23d0c5135c6c46161c5c7956999128cfd.png" src="../_images/272fcad00f3c5107e100d4c22b1639b23d0c5135c6c46161c5c7956999128cfd.png" style="width: 500px; height: 414px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f321ef3d9d0, at 0x7f32244f3d90&gt;
 </pre></div>
 </div>
 </div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">graph-tool</span></code> has a repo of networks: <a class="reference external" href="https://networks.skewed.de/">https://networks.skewed.de/</a></p>
 </section>
-</section>
-<section id="property-maps-in-graph-tool">
-<h2>Property maps in <code class="docutils literal notranslate"><span class="pre">graph-tool</span></code><a class="headerlink" href="#property-maps-in-graph-tool" title="Link to this heading">#</a></h2>
-<p>Property maps are a way of associating additional information to the vertices, edges, or to the graph itself. There are thus three types of property maps: vertex, edge, and graph. They are handled by the classes <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.VertexPropertyMap.html#graph_tool.VertexPropertyMap"><code class="docutils literal notranslate"><span class="pre">VertexPropertyMap</span></code></a>, <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.EdgePropertyMap.html#graph_tool.EdgePropertyMap"><code class="docutils literal notranslate"><span class="pre">EdgePropertyMap</span></code></a>, and <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.GraphPropertyMap.html#graph_tool.GraphPropertyMap"><code class="docutils literal notranslate"><span class="pre">GraphPropertyMap</span></code></a>. Each created property map has an associated <em>value type</em>, which must be chosen from the predefined set:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from gt file </span>
-</pre></div>
-</div>
-</div>
-</div>
-</section>
+<section id="manipulate-graphs">
+<h2>Manipulate graphs<a class="headerlink" href="#manipulate-graphs" title="Link to this heading">#</a></h2>
 <section id="iterating-over-nodes-and-edges">
-<h2>Iterating over nodes and edges<a class="headerlink" href="#iterating-over-nodes-and-edges" title="Link to this heading">#</a></h2>
+<h3>Iterating over nodes and edges<a class="headerlink" href="#iterating-over-nodes-and-edges" title="Link to this heading">#</a></h3>
 </section>
 <section id="iterating-over-neighbors">
-<h2>Iterating over neighbors<a class="headerlink" href="#iterating-over-neighbors" title="Link to this heading">#</a></h2>
+<h3>Iterating over neighbors<a class="headerlink" href="#iterating-over-neighbors" title="Link to this heading">#</a></h3>
 </section>
 <section id="advanced-iteration">
-<h2>Advanced iteration<a class="headerlink" href="#advanced-iteration" title="Link to this heading">#</a></h2>
+<h3>Advanced iteration<a class="headerlink" href="#advanced-iteration" title="Link to this heading">#</a></h3>
+</section>
 </section>
 </section>
 
@@ -635,17 +856,21 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-graphs">Creating graphs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-example-to-create-a-weighted-graph">A simple example to create a weighted graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-ways-to-create-graphs">More ways to create graphs</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#edge-list">Edge list</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adjacency-list">Adjacency list</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-matrix">Sparse Matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-graph-from-file">Loading graph from file</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-i-o-saving-and-loading-graph">Graph I/O (saving and loading graph)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#property-maps-in-graph-tool">Property maps in <code class="docutils literal notranslate"><span class="pre">graph-tool</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-nodes-and-edges">Iterating over nodes and edges</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-neighbors">Iterating over neighbors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-iteration">Advanced iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-attributes-to-graphs-nodes-and-edges">Adding attributes to graphs, nodes, and edges</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulate-graphs">Manipulate graphs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-nodes-and-edges">Iterating over nodes and edges</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-neighbors">Iterating over neighbors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-iteration">Advanced iteration</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -672,7 +897,7 @@ By Alex Tao
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 21, 2025.
+  Last updated on May 22, 2025.
   <br/>
 </p>
   </div>
