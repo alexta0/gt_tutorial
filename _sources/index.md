@@ -39,5 +39,3 @@ use_cases/null_models
 
 
 ```
-
-_Last updated on: {{ last_updated }}_
