@@ -1,4 +1,4 @@
-# Welcome to the Graph-Tool Tutorial
+# Welcome to the graph-tool tutorial
 
 Welcome to this website dedicated to learning and exploring the [`graph-tool`](https://graph-tool.skewed.de/) package!
 
@@ -8,12 +8,12 @@ We'd love to have you contribute to this tutorial, whether it's fixing a typo, a
 
 ---
 
-## 📚 What's Inside
+## 📚 What's inside
 
 This tutorial is organized into three main parts:
 
 1. **Getting Started with `graph-tool`**  
-   A gentle introduction to the basic API and programming patterns — perfect if you're new to the library.
+   A gentle introduction to the basic API and programming patterns — useful if you're new to the library.
 
 2. **Stochastic Block Model (SBM) Recipes**  
    A collection of practical examples showing how to use `graph-tool` for Bayesian inference using stochastic block models.
