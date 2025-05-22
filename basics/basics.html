@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -336,9 +336,11 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-attributes-to-graphs-nodes-and-edges">Adding attributes to graphs, nodes, and edges</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulate-graphs">Manipulate graphs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-and-removing-vertices-and-edges">Adding and removing vertices and edges</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-nodes-and-edges">Iterating over nodes and edges</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-neighbors">Iterating over neighbors</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-iteration">Advanced iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-all-neighbors-of-a-vertex">Iterating over all neighbors of a vertex</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#faster-iteration-without-descriptors">Faster iteration without descriptors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fastest-loopless-iteration-via-numpy-arrays">Fastest: loopless iteration via numpy arrays</a></li>
 </ul>
 </li>
 </ul>
@@ -364,6 +366,12 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>libGL error: No matching fbConfigs or visuals found
+libGL error: failed to load driver: swrast
+</pre></div>
+</div>
+</div>
 </div>
 <section id="a-simple-example-to-create-a-weighted-graph">
 <h2>A simple example to create a weighted graph<a class="headerlink" href="#a-simple-example-to-create-a-weighted-graph" title="Link to this heading">#</a></h2>
@@ -375,7 +383,9 @@ document.write(`
 </div>
 </div>
 </div>
-<p>This line creates a directed graph. If you want a directed graph (like a citation network or web graph), use <code class="docutils literal notranslate"><span class="pre">directed=False</span></code>. We then create an edge property map for weights.</p>
+<p>This initializes a directed graph.</p>
+<p>Next, we define two property maps: one for assigning <strong>weights</strong> to edges (useful when edges represent costs, distances, or any other real-world meanings), and another for adding <strong>labels</strong> to the vertices so we can easily identify them by name instead of just their numeric ID.</p>
+<p>This following line prepares the graph to store a weight value for every edge we’ll add later.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_weight</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_edge_property</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
@@ -383,6 +393,7 @@ document.write(`
 </div>
 </div>
 </div>
+<p>Then, we initialize a new vertex property to store a string value for every node.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vertex_label</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">new_vertex_property</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span>
@@ -390,10 +401,20 @@ document.write(`
 </div>
 </div>
 </div>
-<p>What is a property map?
-A property map in graph-tool is a data structure that attaches additional information to each element of the graph — such as a label, a category, or, in our case, a numeric weight.
-Here, “int” means the values are floating-point numbers (like 2 or 3), which are perfect for edge weights.</p>
-<p>This line prepares the graph to store a weight value for every edge we’ll add later.</p>
+<p>What Is a <a class="reference external" href="https://graph-tool.skewed.de/static/docs/stable/autosummary/graph_tool.PropertyMap.html">Property Map</a>?</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">graph-tool</span></code>, a <strong>property map</strong> is a core concept. Think of it as a flexible way to attach extra information — or <em>metadata</em> — to each vertex, edge, or the graph itself.</p>
+<p>You can use property maps to store things like:</p>
+<ul class="simple">
+<li><p>A label or name for a node (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;Alice&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Router</span> <span class="pre">3&quot;</span></code>)</p></li>
+<li><p>A weight on an edge (e.g., <code class="docutils literal notranslate"><span class="pre">3.5</span></code> for distance or cost)</p></li>
+<li><p>A color, category, or timestamp — basically, any structured data you want to associate with graph elements</p></li>
+</ul>
+<p>In our example, we create an integer property map, which means we’re storing simple whole numbers (like <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code>, or <code class="docutils literal notranslate"><span class="pre">3</span></code>) on graph elements. This could be useful for assigning unique IDs, group numbers, or levels.</p>
+<p>The most important takeaway is this:</p>
+<blockquote>
+<div><p><strong>Property maps are how <code class="docutils literal notranslate"><span class="pre">graph-tool</span></code> lets you define what kind of graph you’re working with — whether it’s weighted, directed, layered, or labeled.</strong></p>
+</div></blockquote>
+<p>They’re not just a convenience — they’re foundational to how graph-tool works.</p>
 <p>We then add some vertices in the graph.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -433,10 +454,10 @@ Here, “int” means the values are floating-point numbers (like 2 or 3), which
 </div>
 <p>Here:</p>
 <ul class="simple">
-<li><p>add_edge(v0, v1) connects two vertices.</p></li>
-<li><p>edge_weight[e] = … assigns a weight to that specific edge using our property map.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add_edge(v0,</span> <span class="pre">v1)</span></code> connects two vertices.
+-<code class="docutils literal notranslate"><span class="pre">edge_weight[e]</span> <span class="pre">=</span> <span class="pre">...</span></code> assigns a weight to that specific edge using our property map.</p></li>
 </ul>
-<p>We then attach the edge_weight property map to the graph under the key “weight”. This makes it easy to access later (for example, during saving, loading, or running graph algorithms).</p>
+<p>We then attach the <code class="docutils literal notranslate"><span class="pre">edge_weight</span></code> property map to the graph under the key “weight”. This makes it easy to access later (for example, during saving, loading, or running graph algorithms).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">edge_properties</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_weight</span>
@@ -476,9 +497,8 @@ Here, “int” means the values are floating-point numbers (like 2 or 3), which
 </div>
 </div>
 </div>
-<p>This draws the graph and saves it to weighted_graph.png. The edge weights will appear as labels along the edges.</p>
-<p>You must have Cairo installed to save to PNG or PDF.</p>
-<p>In summary, <code class="docutils literal notranslate"><span class="pre">gt.Graph</span></code> is a general multigraph class. This class encapsulates either a directed multigraph (default or if directed == True) or an undirected multigraph (if directed == False), with optional internal edge, vertex or graph properties.</p>
+<p>This draws the graph. The edge weights will appear as labels along the edges.</p>
+<p>In summary, <code class="docutils literal notranslate"><span class="pre">gt.Graph</span></code> is a general multigraph class. This class encapsulates either a directed multigraph (default or if <code class="docutils literal notranslate"><span class="pre">directed</span> <span class="pre">==</span> <span class="pre">True</span></code>) or an undirected multigraph (if <code class="docutils literal notranslate"><span class="pre">directed</span> <span class="pre">==</span> <span class="pre">False</span></code>), with optional internal edge, vertex or graph properties.</p>
 </section>
 <section id="more-ways-to-create-graphs">
 <h2>More ways to create graphs<a class="headerlink" href="#more-ways-to-create-graphs" title="Link to this heading">#</a></h2>
@@ -799,14 +819,391 @@ Here, “int” means the values are floating-point numbers (like 2 or 3), which
 </section>
 <section id="manipulate-graphs">
 <h2>Manipulate graphs<a class="headerlink" href="#manipulate-graphs" title="Link to this heading">#</a></h2>
+<p>For this section, we’ll use the <a class="reference external" href="https://networks.skewed.de/net/karate">Zachary Karate Club graph</a> from the built-in dataset <a class="reference external" href="https://networks.skewed.de/">collection</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">ns</span><span class="p">[</span><span class="s2">&quot;karate/77&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="adding-and-removing-vertices-and-edges">
+<h3>Adding and removing vertices and edges<a class="headerlink" href="#adding-and-removing-vertices-and-edges" title="Link to this heading">#</a></h3>
+<p>Add a new vertex</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v_new</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Add multiple vertices with</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># adds 3 new vertices</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;generator object Graph.add_vertex.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f5b6b46fe60&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Add a new edge</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v0</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">e_new</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">v_new</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can remove an edge using its descriptor:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e_new</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or get an existing one and remove it:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># get the edge from vertex 0 to 1</span>
+<span class="k">if</span> <span class="n">e</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that removing a vertex will remove all incident edges:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">remove_vertex</span><span class="p">(</span><span class="n">v_new</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 <section id="iterating-over-nodes-and-edges">
 <h3>Iterating over nodes and edges<a class="headerlink" href="#iterating-over-nodes-and-edges" title="Link to this heading">#</a></h3>
+<p>🔁 All Vertices:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vertex: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Vertex: 0
+Vertex: 1
+Vertex: 2
+Vertex: 3
+Vertex: 4
+Vertex: 5
+Vertex: 6
+Vertex: 7
+Vertex: 8
+Vertex: 9
+Vertex: 10
+Vertex: 11
+Vertex: 12
+Vertex: 13
+Vertex: 14
+Vertex: 15
+Vertex: 16
+Vertex: 17
+Vertex: 18
+Vertex: 19
+Vertex: 20
+Vertex: 21
+Vertex: 22
+Vertex: 23
+Vertex: 24
+Vertex: 25
+Vertex: 26
+Vertex: 27
+Vertex: 28
+Vertex: 29
+Vertex: 30
+Vertex: 31
+Vertex: 32
+Vertex: 33
+Vertex: 34
+Vertex: 35
+Vertex: 36
+</pre></div>
+</div>
+</div>
+</div>
+<p>🔁 All edges</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edge from </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">source</span><span class="p">())</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">target</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Edge from 0 to 2
+Edge from 0 to 3
+Edge from 0 to 4
+Edge from 0 to 5
+Edge from 0 to 6
+Edge from 0 to 7
+Edge from 0 to 8
+Edge from 0 to 10
+Edge from 0 to 11
+Edge from 0 to 12
+Edge from 0 to 13
+Edge from 0 to 17
+Edge from 0 to 19
+Edge from 0 to 21
+Edge from 0 to 31
+Edge from 1 to 2
+Edge from 1 to 3
+Edge from 1 to 7
+Edge from 1 to 13
+Edge from 1 to 17
+Edge from 1 to 19
+Edge from 1 to 21
+Edge from 1 to 30
+Edge from 2 to 3
+Edge from 2 to 7
+Edge from 2 to 8
+Edge from 2 to 9
+Edge from 2 to 13
+Edge from 2 to 27
+Edge from 2 to 28
+Edge from 2 to 32
+Edge from 3 to 7
+Edge from 3 to 12
+Edge from 3 to 13
+Edge from 4 to 6
+Edge from 4 to 10
+Edge from 5 to 6
+Edge from 5 to 10
+Edge from 5 to 16
+Edge from 6 to 16
+Edge from 8 to 30
+Edge from 8 to 32
+Edge from 8 to 33
+Edge from 9 to 33
+Edge from 13 to 33
+Edge from 19 to 33
+Edge from 23 to 25
+Edge from 23 to 29
+Edge from 25 to 24
+Edge from 27 to 23
+Edge from 27 to 24
+Edge from 27 to 33
+Edge from 28 to 33
+Edge from 29 to 26
+Edge from 30 to 32
+Edge from 30 to 33
+Edge from 31 to 24
+Edge from 31 to 25
+Edge from 31 to 28
+Edge from 31 to 32
+Edge from 31 to 33
+Edge from 32 to 14
+Edge from 32 to 15
+Edge from 32 to 18
+Edge from 32 to 20
+Edge from 32 to 22
+Edge from 32 to 23
+Edge from 32 to 29
+Edge from 32 to 33
+Edge from 33 to 14
+Edge from 33 to 15
+Edge from 33 to 18
+Edge from 33 to 20
+Edge from 33 to 23
+Edge from 33 to 26
+Edge from 33 to 29
+</pre></div>
+</div>
+</div>
+</div>
 </section>
-<section id="iterating-over-neighbors">
-<h3>Iterating over neighbors<a class="headerlink" href="#iterating-over-neighbors" title="Link to this heading">#</a></h3>
+<section id="iterating-over-all-neighbors-of-a-vertex">
+<h3>Iterating over all neighbors of a vertex<a class="headerlink" href="#iterating-over-all-neighbors-of-a-vertex" title="Link to this heading">#</a></h3>
+<p>Let’s use vertex 0 as an example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Out-neighbors (for directed graphs; works for undirected too)</span>
+<span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">out_neighbors</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vertex 0 connects to </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># In-neighbors (only relevant for directed graphs)</span>
+<span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">in_neighbors</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span><span class="si">}</span><span class="s2"> connects to Vertex 0&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Vertex 0 connects to 2
+Vertex 0 connects to 3
+Vertex 0 connects to 4
+Vertex 0 connects to 5
+Vertex 0 connects to 6
+Vertex 0 connects to 7
+Vertex 0 connects to 8
+Vertex 0 connects to 10
+Vertex 0 connects to 11
+Vertex 0 connects to 12
+Vertex 0 connects to 13
+Vertex 0 connects to 17
+Vertex 0 connects to 19
+Vertex 0 connects to 21
+Vertex 0 connects to 31
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can also use:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">out_edges</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edge from </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">source</span><span class="p">())</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">target</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Edge from 0 to 2
+Edge from 0 to 3
+Edge from 0 to 4
+Edge from 0 to 5
+Edge from 0 to 6
+Edge from 0 to 7
+Edge from 0 to 8
+Edge from 0 to 10
+Edge from 0 to 11
+Edge from 0 to 12
+Edge from 0 to 13
+Edge from 0 to 17
+Edge from 0 to 19
+Edge from 0 to 21
+Edge from 0 to 31
+</pre></div>
+</div>
+</div>
+</div>
 </section>
-<section id="advanced-iteration">
-<h3>Advanced iteration<a class="headerlink" href="#advanced-iteration" title="Link to this heading">#</a></h3>
+<section id="faster-iteration-without-descriptors">
+<h3>Faster iteration without descriptors<a class="headerlink" href="#faster-iteration-without-descriptors" title="Link to this heading">#</a></h3>
+<p>If you’re just dealing with integer vertex indices and don’t need full descriptors:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_vertices</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">num_vertices</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vertices</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vertex </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Vertex 0
+Vertex 1
+Vertex 2
+Vertex 3
+Vertex 4
+Vertex 5
+Vertex 6
+Vertex 7
+Vertex 8
+Vertex 9
+Vertex 10
+Vertex 11
+Vertex 12
+Vertex 13
+Vertex 14
+Vertex 15
+Vertex 16
+Vertex 17
+Vertex 18
+Vertex 19
+Vertex 20
+Vertex 21
+Vertex 22
+Vertex 23
+Vertex 24
+Vertex 25
+Vertex 26
+Vertex 27
+Vertex 28
+Vertex 29
+Vertex 30
+Vertex 31
+Vertex 32
+Vertex 33
+Vertex 34
+Vertex 35
+Vertex 36
+</pre></div>
+</div>
+</div>
+</div>
+<p>Likewise, for edges:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edges</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">source</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">target</span><span class="p">()))</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">()]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="fastest-loopless-iteration-via-numpy-arrays">
+<h3>Fastest: loopless iteration via numpy arrays<a class="headerlink" href="#fastest-loopless-iteration-via-numpy-arrays" title="Link to this heading">#</a></h3>
+<p>So far, we’ve been using standard Python loops to iterate over the graph — which is intuitive and flexible, but not the most efficient way to process large graphs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+    <span class="c1"># do something</span>
+</pre></div>
+</div>
+<p>…you’re staying in Python land. That means you’re missing out on one of graph-tool’s biggest strengths: its C++ backend.</p>
+<p>Just like NumPy encourages you to replace Python loops with array operations, graph-tool provides a set of <strong>loopless, array-based methods</strong> that let you operate directly on entire slices of the graph — fast and vectorized.</p>
+<p>Instead of looping over vertices and calling g.vertex(i).out_degree(), just do this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">ns</span><span class="p">[</span><span class="s2">&quot;karate/77&quot;</span><span class="p">]</span>
+
+<span class="c1"># Get the out-degrees of all vertices as a NumPy array</span>
+<span class="n">out_degrees</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_out_degrees</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_vertices</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">out_degrees</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[15  8 10  6  3  4  4  4  5  2  3  1  2  5  2  2  2  2  2  3  2  2  1  5
+  3  3  2  4  3  4  4  6 12 16  0  0  0]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Suppose you want to compute the sum of the product of the in-degree of the target and the out-degree of the source for all edges. Here’s how you do that efficiently:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">Graph</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)])</span> 
+<span class="n">edges</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_edges</span><span class="p">()</span>  <span class="c1"># Nx2 array of [source, target] pairs</span>
+
+<span class="n">in_degs</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_in_degrees</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_vertices</span><span class="p">())</span>
+<span class="n">out_degs</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_out_degrees</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">get_vertices</span><span class="p">())</span>
+
+<span class="c1"># Vectorized multiplication and summation</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">out_degs</span><span class="p">[</span><span class="n">edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">in_degs</span><span class="p">[</span><span class="n">edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 </section>
 </section>
@@ -866,9 +1263,11 @@ Here, “int” means the values are floating-point numbers (like 2 or 3), which
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-attributes-to-graphs-nodes-and-edges">Adding attributes to graphs, nodes, and edges</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manipulate-graphs">Manipulate graphs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-and-removing-vertices-and-edges">Adding and removing vertices and edges</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-nodes-and-edges">Iterating over nodes and edges</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-neighbors">Iterating over neighbors</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-iteration">Advanced iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-over-all-neighbors-of-a-vertex">Iterating over all neighbors of a vertex</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#faster-iteration-without-descriptors">Faster iteration without descriptors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fastest-loopless-iteration-via-numpy-arrays">Fastest: loopless iteration via numpy arrays</a></li>
 </ul>
 </li>
 </ul>
