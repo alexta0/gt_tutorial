@@ -1,0 +1,1094 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SBM variations &#8212; graph-tool tutorial</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=e1a75a79"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'cookbook/forward_process';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="May 30, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">graph-tool tutorial</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Welcome to the graph-tool tutorial
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Guides</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../basics/basics.html">Create and manipulate graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/graph_plotting.html">Plot graphs</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Cookbook</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference-undirected-graphs.html">Bayesian Inference of Stochastic Block Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topsbm.html">TopSBM: modeling texts as a bipartite network</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Use Cases</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/degree_distribution_visualization.html">Visualize degree distributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/centrality.html">Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/random_graphs_generation.html">Random graphs generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/null_models.html">Null models</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/cookbook/forward_process.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>SBM variations</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#random-graph">Random Graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assortative-structure">Assortative structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disassortative-structure-bipartite-structure">Disassortative structure – Bipartite structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-periphery-structure">Core-periphery structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordered-structure">Ordered Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mixing-patterns">Mixing patterns</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+<span class="o">%</span><span class="k">config</span> InlineBackend.figure_format =&#39;retina&#39;
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span> 
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">graph_tool.all</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span> 
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">blue</span> <span class="o">=</span> <span class="p">[</span><span class="mi">163</span><span class="p">,</span> <span class="mi">210</span><span class="p">,</span> <span class="mi">198</span><span class="p">]</span>
+<span class="n">pink</span> <span class="o">=</span> <span class="p">[</span><span class="mi">239</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">227</span><span class="p">]</span>
+<span class="n">red</span> <span class="o">=</span> <span class="p">[</span><span class="mi">224</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">114</span><span class="p">]</span>
+<span class="n">orange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">235</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span> <span class="mi">103</span><span class="p">]</span>
+<span class="n">green</span> <span class="o">=</span> <span class="p">[</span><span class="mi">192</span><span class="p">,</span> <span class="mi">221</span><span class="p">,</span> <span class="mi">114</span><span class="p">]</span>
+<span class="n">yellow</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">236</span><span class="p">,</span> <span class="mi">119</span><span class="p">]</span>
+<span class="n">purple</span> <span class="o">=</span> <span class="p">[</span><span class="mi">172</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">186</span><span class="p">]</span>
+
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">blue</span><span class="p">,</span> <span class="n">pink</span><span class="p">,</span> <span class="n">red</span><span class="p">,</span> <span class="n">orange</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">yellow</span><span class="p">,</span> <span class="n">purple</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plotStyles.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">rcParams</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_plot_style</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">14</span><span class="p">):</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PDF&quot;</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Serif&quot;</span>
+    <span class="c1"># rcParams[&quot;font.serif&quot;] = [&quot;Times&quot;]</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">font_size</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.labelsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">font_size</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;xtick.labelsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">font_size</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;ytick.labelsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">font_size</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;legend.numpoints&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;legend.fontsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;small&quot;</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;lines.markersize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.subplot.top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.95</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.subplot.bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.subplot.left&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.subplot.right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.95</span>
+
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;image.cmap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;magma&quot;</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;text.usetex&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;ps.usedistiller&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;xpdf&quot;</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;pdf.compression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;ps.useafm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;path.simplify&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;text.latex.preamble&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># r&quot;\usepackage{times}&quot;,</span>
+        <span class="c1"># r&quot;\usepackage{euler}&quot;,</span>
+        <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{amssymb}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{amsmath}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+<span class="n">apply_plot_style</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span><span class="w"> </span><span class="nn">plotStyles</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">ampgrad</span><span class="o">/</span><span class="n">yuanming</span><span class="o">/</span><span class="n">graph_tool_tutorial</span><span class="o">/</span><span class="n">cookbook</span><span class="o">/</span><span class="n">plotStyles</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">34</span>
+<span class="g g-Whitespace">     </span><span class="mi">32</span> <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;ps.useafm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="g g-Whitespace">     </span><span class="mi">33</span> <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;path.simplify&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="ne">---&gt; </span><span class="mi">34</span> <span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;text.latex.preamble&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="c1">#r&quot;\usepackage{times}&quot;,</span>
+<span class="g g-Whitespace">     </span><span class="mi">35</span>                                    <span class="c1">#r&quot;\usepackage{euler}&quot;,</span>
+<span class="g g-Whitespace">     </span><span class="mi">36</span>                                    <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{amssymb}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">37</span>                                    <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{amsmath}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+<span class="nn">File /nb/yuanming/miniconda3/envs/gt/lib/python3.13/site-packages/matplotlib/__init__.py:771,</span> in <span class="ni">RcParams.__setitem__</span><span class="nt">(self, key, val)</span>
+<span class="g g-Whitespace">    </span><span class="mi">769</span>         <span class="n">cval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="n">val</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">770</span>     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ve</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">771</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ve</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<span class="g g-Whitespace">    </span><span class="mi">772</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">cval</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">773</span> <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+
+<span class="ne">ValueError</span>: Key text.latex.preamble: Could not convert [&#39;\\usepackage{amssymb}&#39;, &#39;\\usepackage{amsmath}&#39;] to str
+</pre></div>
+</div>
+</div>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="sbm-variations">
+<h1>SBM variations<a class="headerlink" href="#sbm-variations" title="Link to this heading">#</a></h1>
+<p>finished &#64; 18/08/2019, 19:40</p>
+<section id="random-graph">
+<h2>Random Graph<a class="headerlink" href="#random-graph" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>
+
+
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">]</span><span class="o">*</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">mat</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>  <span class="c1"># setup the plot</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mat</span><span class="p">),</span><span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Group $s$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Group $r$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">blue</span><span class="p">,</span><span class="n">orange</span><span class="p">,</span><span class="n">yellow</span> <span class="p">))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+<span class="c1"># define the bins and normalize</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+<span class="c1"># create a second axes for the colorbar</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.1955</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.755</span><span class="p">])</span>
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax_cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.98</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.03</span><span class="p">])</span> 
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax_cbar1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[],</span>  <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+<span class="c1"># plt.savefig(&quot;01-assortative-adj.svg&quot;)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/7552c2b541abdf1887764fe71b4b758b095df2fb28a477109167561831271875.png"><img alt="../_images/7552c2b541abdf1887764fe71b4b758b095df2fb28a477109167561831271875.png" src="../_images/7552c2b541abdf1887764fe71b4b758b095df2fb28a477109167561831271875.png" style="width: 304px; height: 307px;" />
+</a>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">blue</span><span class="p">,</span><span class="n">orange</span><span class="p">,</span><span class="n">yellow</span> <span class="p">))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+                        <span class="n">deg_sampler</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+                        <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;blockmodel&quot;</span><span class="p">,</span>
+                        <span class="n">block_membership</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
+                        <span class="n">edge_probs</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> 
+                        <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">label_largest_component</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">GraphView</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">vfilt</span><span class="o">=</span><span class="n">l</span><span class="p">)</span> 
+<span class="n">state</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">BlockState</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bm</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">vertex_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> 
+           <span class="n">vertex_fill_color</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span>
+           <span class="n">vertex_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+           <span class="n">vertex_anchor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> 
+           <span class="n">vcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/15fcf5faff04ace451ffb79c86a02e017378a2dd6ca0c3938e50272709ca73e0.png"><img alt="../_images/15fcf5faff04ace451ffb79c86a02e017378a2dd6ca0c3938e50272709ca73e0.png" src="../_images/15fcf5faff04ace451ffb79c86a02e017378a2dd6ca0c3938e50272709ca73e0.png" style="width: 570px; height: 600px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2946bf2f90, at 0x7f2946ad94e0&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="assortative-structure">
+<h2>Assortative structure<a class="headerlink" href="#assortative-structure" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.99</span><span class="p">,</span><span class="mf">0.01</span><span class="p">])</span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span> 
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="n">j</span><span class="p">:</span> 
+            <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span> <span class="n">mat</span><span class="p">,</span> <span class="n">mat</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="p">)</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>  <span class="c1"># setup the plot</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mat</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Group $s$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Group $r$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">colors</span><span class="p">[:</span><span class="n">B</span><span class="p">]))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+<span class="c1"># define the bins and normalize</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+<span class="c1"># create a second axes for the colorbar</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.1955</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.755</span><span class="p">])</span>
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax_cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.98</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.03</span><span class="p">])</span> 
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax_cbar1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[],</span>  <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+<span class="c1"># plt.tight_layout()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/05cb57ee575ac9e5e3c16fafbf61471e2596c549927caf3a9768ec035dd71cbf.png"><img alt="../_images/05cb57ee575ac9e5e3c16fafbf61471e2596c549927caf3a9768ec035dd71cbf.png" src="../_images/05cb57ee575ac9e5e3c16fafbf61471e2596c549927caf3a9768ec035dd71cbf.png" style="width: 304px; height: 307px;" />
+</a>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">colors</span><span class="p">[:</span><span class="n">B</span><span class="p">]))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+                        <span class="n">deg_sampler</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+                        <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;blockmodel&quot;</span><span class="p">,</span>
+                        <span class="n">block_membership</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
+                        <span class="n">edge_probs</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> 
+                       <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">sfdp_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">groups</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">BlockState</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bm</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">vertex_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> 
+           <span class="n">vertex_fill_color</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span>
+           <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> 
+           <span class="n">vertex_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+           <span class="n">vertex_anchor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">vcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/96d9c54b7e2f0c8d6e8c622794144d483f23ed83efa9f0944d5997f62a6f2ebe.png"><img alt="../_images/96d9c54b7e2f0c8d6e8c622794144d483f23ed83efa9f0944d5997f62a6f2ebe.png" src="../_images/96d9c54b7e2f0c8d6e8c622794144d483f23ed83efa9f0944d5997f62a6f2ebe.png" style="width: 530px; height: 600px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2946a4de50, at 0x7f2946ad87c0&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="disassortative-structure-bipartite-structure">
+<h2>Disassortative structure – Bipartite structure<a class="headerlink" href="#disassortative-structure-bipartite-structure" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">50</span> 
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">colors</span><span class="p">[:</span><span class="n">B</span><span class="p">]))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">B</span><span class="p">,</span><span class="n">B</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span> 
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="n">j</span><span class="p">:</span> 
+            <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span> <span class="n">mat</span><span class="p">,</span> <span class="n">mat</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># setup the plot</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Group $s$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Group $r$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">colors</span><span class="p">[:</span><span class="n">B</span><span class="p">]))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="c1"># define the bins and normalize</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+<span class="c1"># create a second axes for the colorbar</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.1955</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.755</span><span class="p">])</span>
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax_cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.98</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.03</span><span class="p">])</span> 
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax_cbar1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[],</span>  <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;03-bipartite-adj.svg&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/d1e9d32cb071df43bb664b644d42c10636e96a9a762d6503000521500947d778.png"><img alt="../_images/d1e9d32cb071df43bb664b644d42c10636e96a9a762d6503000521500947d778.png" src="../_images/d1e9d32cb071df43bb664b644d42c10636e96a9a762d6503000521500947d778.png" style="width: 304px; height: 307px;" />
+</a>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+                        <span class="n">deg_sampler</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+                        <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;blockmodel&quot;</span><span class="p">,</span>
+                        <span class="n">block_membership</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]),</span>
+                        <span class="c1"># np.random.randint(B)</span>
+                        <span class="n">edge_probs</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> 
+                       <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+
+<span class="n">l</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">label_largest_component</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">GraphView</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">vfilt</span><span class="o">=</span><span class="n">l</span><span class="p">)</span> 
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">trivial_partition</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">vp</span><span class="p">[</span><span class="s1">&#39;trivial_partition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">new_vp</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">vertices</span><span class="p">():</span>
+    <span class="n">trivial_partition</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">NestedBlockState</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="p">[</span><span class="n">bm</span><span class="p">,</span> <span class="n">trivial_partition</span><span class="p">])</span>
+
+<span class="n">edges_toDraw</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">edges</span><span class="p">():</span> 
+    <span class="k">if</span> <span class="n">bm</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">source</span><span class="p">()]</span> <span class="o">!=</span><span class="n">bm</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">target</span><span class="p">()]:</span>
+        <span class="n">edges_toDraw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+<span class="n">state</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">vertex_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> 
+           <span class="n">vertex_fill_color</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span>
+           <span class="n">vertex_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+           <span class="n">vertex_shape</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span> 
+           <span class="n">vertex_anchor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">vcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">,</span> 
+           <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;bipartite&quot;</span><span class="p">,</span> 
+           <span class="n">subsample_edges</span><span class="o">=</span><span class="n">edges_toDraw</span><span class="p">,</span>
+           <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+           <span class="n">hshortcuts</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> 
+           <span class="n">hide</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+           <span class="n">edge_pen_width</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/413a16426bba635388f652b3c4318f8147fefb37a5bc3706d7545f6011840927.png"><img alt="../_images/413a16426bba635388f652b3c4318f8147fefb37a5bc3706d7545f6011840927.png" src="../_images/413a16426bba635388f652b3c4318f8147fefb37a5bc3706d7545f6011840927.png" style="width: 600px; height: 580px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2946a1b130, at 0x7f2937cd9630&gt;,
+ &lt;GraphView object, directed, with 53 vertices and 52 edges, edges filtered by &lt;EdgePropertyMap object with value type &#39;bool&#39;, for Graph 0x7f2946a71130, at 0x7f2946a3a0b0&gt;, vertices filtered by &lt;VertexPropertyMap object with value type &#39;bool&#39;, for Graph 0x7f2946a71130, at 0x7f2937cd8520&gt;, at 0x7f2946a71130&gt;,
+ &lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2946a71130, at 0x7f2946a3a2e0&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="core-periphery-structure">
+<h2>Core-periphery structure<a class="headerlink" href="#core-periphery-structure" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="n">B</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">red</span><span class="p">,</span> <span class="n">orange</span><span class="p">))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">B</span><span class="p">,</span><span class="n">B</span><span class="p">))</span>
+<span class="n">mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9</span> 
+<span class="n">mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span><span class="o">+</span><span class="n">mat</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># setup the plot</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mat</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Group $s$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Group $r$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># define the bins and normalize</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+<span class="c1"># create a second axes for the colorbar</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.1955</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.755</span><span class="p">])</span>
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax_cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.98</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.03</span><span class="p">])</span> 
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax_cbar1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/8869b1489b7620f267d03c1ed49dc0ac34799fe7e823ca1ff9711ccadd388c4a.png"><img alt="../_images/8869b1489b7620f267d03c1ed49dc0ac34799fe7e823ca1ff9711ccadd388c4a.png" src="../_images/8869b1489b7620f267d03c1ed49dc0ac34799fe7e823ca1ff9711ccadd388c4a.png" style="width: 304px; height: 307px;" />
+</a>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>    
+<span class="n">g</span><span class="p">,</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+                        <span class="n">deg_sampler</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span>
+                        <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;blockmodel&quot;</span><span class="p">,</span>
+                        <span class="n">block_membership</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
+                        <span class="n">edge_probs</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> 
+                        <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">BlockState</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bm</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">vertex_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> 
+           <span class="n">vertex_fill_color</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span>
+           <span class="n">vertex_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+           <span class="n">vertex_anchor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">vcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/42283e0ae9d2b98e03e37ddada13be1bc8e0cbe38341dffb79cda86a79b2dbd2.png"><img alt="../_images/42283e0ae9d2b98e03e37ddada13be1bc8e0cbe38341dffb79cda86a79b2dbd2.png" src="../_images/42283e0ae9d2b98e03e37ddada13be1bc8e0cbe38341dffb79cda86a79b2dbd2.png" style="width: 600px; height: 561px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2937cc7a00, at 0x7f2937ca7d20&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="ordered-structure">
+<h2>Ordered Structure<a class="headerlink" href="#ordered-structure" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">50</span> 
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">colors</span><span class="p">[:</span><span class="n">B</span><span class="p">]))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">]</span><span class="o">*</span><span class="n">B</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># setup the plot</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Group $s$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Group $r$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">blue</span><span class="p">,</span><span class="n">green</span><span class="p">,</span><span class="n">red</span><span class="p">,</span><span class="n">pink</span><span class="p">,</span><span class="n">orange</span><span class="p">))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="c1"># define the bins and normalize</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+<span class="c1"># create a second axes for the colorbar</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.1955</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.755</span><span class="p">])</span>
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax_cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.98</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.03</span><span class="p">])</span> 
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax_cbar1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/dd62dec6d1d92363c4bb57e34f1fa86bc3b491f0c7a70666619a6573b84824a9.png"><img alt="../_images/dd62dec6d1d92363c4bb57e34f1fa86bc3b491f0c7a70666619a6573b84824a9.png" src="../_images/dd62dec6d1d92363c4bb57e34f1fa86bc3b491f0c7a70666619a6573b84824a9.png" style="width: 304px; height: 307px;" />
+</a>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+                        <span class="n">deg_sampler</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+                        <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;blockmodel&quot;</span><span class="p">,</span> 
+                        <span class="n">block_membership</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
+                        <span class="n">edge_probs</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> 
+                        <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">BlockState</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">bm</span><span class="p">)</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">sfdp_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> 
+                     <span class="n">groups</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">b</span><span class="p">,</span>
+                     <span class="n">multilevel</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">mu</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> 
+                     <span class="n">p</span> <span class="o">=</span>  <span class="mi">1</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">vertex_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> 
+           <span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span><span class="p">,</span> 
+           <span class="n">vertex_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+           <span class="n">vertex_fill_color</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span> 
+           <span class="n">vertex_anchor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">vcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/91d03172ab519229fd9903397a770ff1e7c6b48ff7405d81bf5a711ebd095f57.png"><img alt="../_images/91d03172ab519229fd9903397a770ff1e7c6b48ff7405d81bf5a711ebd095f57.png" src="../_images/91d03172ab519229fd9903397a770ff1e7c6b48ff7405d81bf5a711ebd095f57.png" style="width: 600px; height: 88px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2937ddaf90, at 0x7f2937b91a90&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="mixing-patterns">
+<h2>Mixing patterns<a class="headerlink" href="#mixing-patterns" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">B</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">colors</span><span class="p">[:</span><span class="n">B</span><span class="p">]))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+<span class="n">in_group</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">out_group</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span> <span class="c1"># periphery out_group </span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">B</span><span class="p">,</span><span class="n">B</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span> 
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">in_group</span> <span class="ow">and</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">in_group</span><span class="p">:</span> 
+            <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span> 
+                <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">out_group</span> <span class="ow">and</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">out_group</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span> 
+                <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.99</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">in_group</span> <span class="ow">and</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">out_group</span><span class="p">:</span> 
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">4</span><span class="p">):</span> 
+                <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+                
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.005</span>
+
+<span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span><span class="o">+</span><span class="n">mat</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prob</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span>
+<span class="n">probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">probs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span> <span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]))</span>
+        
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># setup the plot</span>
+<span class="c1"># mat = g.gp.w</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mat</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Group $s$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Group $r$&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
+
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">pink</span><span class="p">,</span><span class="n">red</span><span class="p">,</span><span class="n">green</span><span class="p">,</span><span class="n">blue</span><span class="p">,</span> <span class="n">orange</span><span class="p">,</span> <span class="n">yellow</span>  <span class="p">))</span><span class="o">/</span><span class="mf">255.0</span><span class="p">)</span>
+
+<span class="c1"># define the bins and normalize</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+<span class="c1"># create a second axes for the colorbar</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.1955</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.755</span><span class="p">])</span>
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax_cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.98</span><span class="p">,</span> <span class="n">p2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.03</span><span class="p">])</span> 
+<span class="n">cb1</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span><span class="n">ax_cbar1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;proportional&#39;</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/e10f3bbaedad1876611927974c37349b5cb1bd9d2754525650c6bcc25e1349c3.png"><img alt="../_images/e10f3bbaedad1876611927974c37349b5cb1bd9d2754525650c6bcc25e1349c3.png" src="../_images/e10f3bbaedad1876611927974c37349b5cb1bd9d2754525650c6bcc25e1349c3.png" style="width: 304px; height: 307px;" />
+</a>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simple blockmodel with B blocks.</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">gt</span><span class="o">.</span><span class="n">seed_rng</span><span class="p">(</span><span class="mi">1213</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">random_graph</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+                        <span class="n">deg_sampler</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span>
+                        <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;blockmodel&quot;</span><span class="p">,</span>
+                        <span class="n">block_membership</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+                        <span class="n">edge_probs</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> 
+                        <span class="n">n_iter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">BlockState</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">bm</span><span class="p">)</span>
+
+<span class="n">pos</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">sfdp_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> 
+                     <span class="n">groups</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">b</span><span class="p">,</span>
+                     <span class="n">multilevel</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">mu</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                     <span class="n">p</span> <span class="o">=</span>  <span class="mi">1</span><span class="p">)</span>
+<span class="n">state</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">vertex_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> 
+           <span class="n">vertex_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+           <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+           <span class="n">vertex_fill_color</span> <span class="o">=</span> <span class="n">bm</span><span class="p">,</span> 
+           <span class="n">edge_gradient</span><span class="o">=</span><span class="n">g</span><span class="o">.</span><span class="n">new_ep</span><span class="p">(</span><span class="s2">&quot;vector&lt;double&gt;&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+           <span class="n">vertex_anchor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">vcmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/7b6a4624170dc415b762677ab4a7011c5e97ba60daa6ec163973ac24cb7afd18.png"><img alt="../_images/7b6a4624170dc415b762677ab4a7011c5e97ba60daa6ec163973ac24cb7afd18.png" src="../_images/7b6a4624170dc415b762677ab4a7011c5e97ba60daa6ec163973ac24cb7afd18.png" style="width: 600px; height: 444px;" />
+</a>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;VertexPropertyMap object with value type &#39;vector&lt;double&gt;&#39;, for Graph 0x7f2946b64870, at 0x7f2937ca6430&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#random-graph">Random Graph</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assortative-structure">Assortative structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disassortative-structure-bipartite-structure">Disassortative structure – Bipartite structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-periphery-structure">Core-periphery structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordered-structure">Ordered Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mixing-patterns">Mixing patterns</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Alex Tao
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on May 30, 2025.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
