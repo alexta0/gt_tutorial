@@ -3,6 +3,10 @@
 # Exit on error
 set -e
 
+echo "Cleaning previous builds..."
+make clean
+rm -rf build/html
+
 echo "Building Sphinx documentation..."
 sphinx-build -b html . build/html
 
